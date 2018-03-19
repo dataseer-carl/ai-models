@@ -21,7 +21,16 @@ shinyUI(navbarPage(
   	## _OLS ####
   	tabPanel(
   		"OLS", # tab name
-  		p("Lorem ipsum")
+  		### Intro 
+  		h1("Run Together"),
+  		includeMarkdown("readme_reg00_runtime0_desc.md"),
+  		h3("Data"),
+  		includeMarkdown("readme_reg00_runtime1_data_a.md"),
+  		### Data
+  		wellPanel(
+  			dataTableOutput("dataRuntime")
+  		),
+  		includeMarkdown("readme_reg00_runtime1_data_b.md")
   	),#tabPanel:OLS
   	"----",
   	"Machine learning", # section title
@@ -50,9 +59,10 @@ shinyUI(navbarPage(
   # About ####
   tabPanel(
   	"About", # tab name
-  	p("Lorem ipsum"),
-  	verbatimTextOutput("check_WD"),
-  	verbatimTextOutput("check_WDls")
+  	p("Lorem ipsum")
+  	# Test ####
+  	# verbatimTextOutput("check_WD"),
+  	# verbatimTextOutput("check_WDls")
   ),#tabPanel
   
   # Layout config
