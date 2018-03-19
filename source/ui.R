@@ -51,7 +51,8 @@ shinyUI(navbarPage(
   tabPanel(
   	"About", # tab name
   	p("Lorem ipsum"),
-  	verbatimTextOutput("check_WD")
+  	verbatimTextOutput("check_WD"),
+  	verbatimTextOutput("check_WDls")
   ),#tabPanel
   
   # Layout config

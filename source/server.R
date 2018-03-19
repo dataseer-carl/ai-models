@@ -1,11 +1,4 @@
-#
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+# shinyapps.io wd:  "/srv/connect/apps/ai-models"
 
 library(shiny)
 
@@ -14,5 +7,8 @@ shinyServer(function(input, output) {
   
 	# Print wd ####
   output$check_WD <- renderPrint({getwd()})
+  
+  # Print ls of wd ####
+  output$check_WDls <- renderPrint({dir(getwd())})
   
 })

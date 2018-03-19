@@ -1,7 +1,9 @@
 # Ignore archived files used for reference
 Archive/
 
+# Automatic entries
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.httr-oauth
