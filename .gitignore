@@ -1,0 +1,7 @@
+# Ignore archived files used for reference
+Archive/
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
