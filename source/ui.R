@@ -51,7 +51,7 @@ shinyUI(navbarPage(
 			  				width = 5,
 				  			wellPanel(
 				  				includeMarkdown("readme_reg00_runtime3_model_aa.md"),
-				  				div(withMathJax("$$\\text{predicted RunTime} = \\text{Slope} \\cdot \\text{RunTime} + \\text{Intercept}$$"), style = "font-size: 300%"),
+				  				withMathJax("$$\\text{predicted RunTime} = \\text{Slope} \\cdot \\text{RunTime} + \\text{Intercept}$$"),
 				  				includeMarkdown("readme_reg00_runtime3_model_ab.md"),
 				  				inputPanel(
 				  					numericInput(
@@ -78,7 +78,7 @@ shinyUI(navbarPage(
 				  					column(
 				  						5,
 				  						p("Summarise the indidual errors into a single measurement, such as the RMSE; which is given by the ff formula:"),
-				  						div(withMathJax("$$\\text{RMSE} = \\sqrt{\\frac{\\sum (\\text{Actual} - \\text{Predicted})^2}{n}}$$"), style = "font-size: 300%")
+				  						withMathJax("$$\\text{RMSE} = \\sqrt{\\frac{\\sum (\\text{Actual} - \\text{Predicted})^2}{n}}$$")
 				  					),
 				  					column(
 				  						5, 
@@ -123,7 +123,7 @@ shinyUI(navbarPage(
 	  								width = 6,
 	  								wellPanel(
 		  								h2("Ordinary Least Squares"),
-		  								div(withMathJax("$$\\text{RMSE} = \\sqrt{\\frac{\\sum (\\text{Actual} - \\text{Predicted})^2}{n}}$$"), style = "font-size: 200%"),
+		  								withMathJax("$$\\text{RMSE} = \\sqrt{\\frac{\\sum (\\text{Actual} - \\text{Predicted})^2}{n}}$$"),
 		  								helpText("Find Slope and Intercept such that:"),
 		  								actionButton("findOLStoy", "Least RMSE"),
 		  								div(tableOutput("showRMSEtoy"), style = "font-size: 200%")
@@ -133,7 +133,7 @@ shinyUI(navbarPage(
 	  								width = 6,
 	  								wellPanel(
 		  								h2("Least Absolute Deviation"),
-		  								div(withMathJax("$$\\text{MAE} = \\frac{\\sum |\\text{Actual} - \\text{Predicted}|}{n}$$"), style = "font-size: 200%"),
+		  								withMathJax("$$\\text{MAE} = \\frac{\\sum |\\text{Actual} - \\text{Predicted}|}{n}$$"),
 		  								helpText("Find Slope and Intercept such that:"),
 		  								actionButton("findLADtoy", "Least MAE"),
 		  								div(tableOutput("showMAEtoy"), style = "font-size: 200%")

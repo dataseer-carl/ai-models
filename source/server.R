@@ -4,7 +4,7 @@ library(shiny)
 library(ggplot2)
 library(scales)
 library(dplyr)
-# library(DT)
+library(DT)
 library(Metrics)
 library(L1pack)
 
@@ -105,6 +105,7 @@ shinyServer(function(input, output, session) {
 	})
 	output$showPredRuntime <- renderDataTable(
 		{
+			if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
 			runPred.df <- predRuntime()
 			runPred.df <- runPred.df %>% 
 				mutate_at(
@@ -132,6 +133,7 @@ shinyServer(function(input, output, session) {
 		# http://shiny.rstudio.com/gallery/datatables-options.html
 	)
 	residRuntime <- reactive({
+		if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
 		predRuntime.df <- predRuntime()
 		residRuntime.df <- predRuntime.df %>% 
 			summarise(
