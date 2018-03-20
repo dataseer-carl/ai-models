@@ -1,6 +1,6 @@
 # Ignore archived files used for reference
 Archive/
-source/pre_global.R
+source/Data/
 
 # Automatic entries
 .Rproj.user
