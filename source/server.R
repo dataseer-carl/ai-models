@@ -10,6 +10,7 @@ library(L1pack)
 library(shiny)
 library(DT)
 library(stringr)
+library(readxl)
 
 endLab <- function(first.lab, last.lab){
 	temp.fxn <- function(x){
@@ -559,6 +560,66 @@ shinyServer(function(input, output, session) {
 	# CV01 ####
 	# CV02 ####
 	
+  # Workshop ####
+  scoreClaims <- reactive({
+  	
+  	answer.path <- input$answerClaims$datapath
+  	# answer.path <- file.path(".", "source", "Data", "potential-claims predictions.rds")
+  	key.df <- readRDS(answer.path)
+  	
+  	submit.path <- input$submitClaims$datapath
+  	# submit.path <- file.path(".", "source", "Data", "sample00.xlsx")
+  	
+  	teams <- excel_sheets(submit.path)
+  	submit.ls <- lapply(
+			as.list(teams),
+			function(temp.team){
+				temp.df <- read_excel(submit.path, sheet = temp.team, col_names = TRUE)
+				temp.df <- temp.df %>%
+					mutate(Team = temp.team) %>% 
+					rename(Claims.hat = `Total Claim Amount`)
+				return(temp.df)
+			}
+		)
+		names(submit.ls) <- teams
+		
+		submit.df <- do.call(bind_rows, submit.ls)
+		results.df <- submit.df %>% 
+			left_join(key.df) %>% 
+			group_by(Team) %>% 
+			summarise(RMSE = rmse(`Total Claim Amount`, Claims.hat)) %>% 
+			ungroup() %>% 
+			mutate(Rank = rank(RMSE))
+  	
+		return(results.df)
+		
+  })#scoreClaims
+  output$rankClaims <- renderDataTable(
+  	{
+  		scores.df <- scoreClaims()
+  		scores.dt <- scores.df %>% 
+  			select(Rank, Team, RMSE) %>% 
+  			arrange(RMSE) %>% 
+  			datatable(
+  				rownames = FALSE,
+  				options = list(
+			  		paging = FALSE, lengthChange = FALSE, searching = FALSE, 
+			  		ordering = FALSE, info = FALSE
+			  	)
+  			) %>% 
+  			formatStyle(
+  				"Rank", target = "row",
+  				backgroundColor = styleEqual(
+  					1:3,
+  					c("gold", "silver", "orange")
+  				)
+  			) %>% 
+  			formatRound("RMSE")
+  		# https://rstudio.github.io/DT/010-style.html
+  		return(scores.dt)
+  	}
+  )#showScores
+  
 	  # Test ####
 # 	# Print wd ###
 #   output$check_WD <- renderPrint({getwd()})

@@ -364,6 +364,43 @@ shinyUI(navbarPage(
   	tabPanel("SVM")#tabPanel:SVM
   ),#navbarMenu:Classification
   
+	# Workshops ####
+  navbarMenu(
+  	"Workshop",
+  	tabPanel(
+  		"Day 1: Potential claims",
+  		# fileInput("answerkeyDay1", "Upload Runtime.csv"),
+  		h1("Potential claims prediction"),
+  		p("Day 1 Workshop"),
+  		fluidRow(
+  			column(
+  				width = 7,
+  				wellPanel(
+  					includeMarkdown("readme_workshop_day1.md")
+  				)
+  				# div(img(src = "car-insurance1.jpg"), align = "center", style = "width: 150px;"),
+  			),#column
+  			column(
+  				width = 5,
+  				fileInput("answerClaims", "Answer key"),
+  				fileInput("submitClaims", "Submissions"),
+  				div(
+						dataTableOutput("rankClaims"),
+						tags$style(type="text/css", "#view tr:last-child {font-weight:bold;}")
+					)
+  			)
+  		)#fluidRow
+  	),#tabPanel
+  	tabPanel(
+  		"Day 2: Regression",
+  		p("Lorem ipsum")
+  	),#tabPanel
+  	tabPanel(
+  		"Day 3: Classification",
+  		p("Lorem ipsum")
+  	)#tabPanel
+  ),#navbarMenu
+
   # About ####
   tabPanel(
   	"About", # tab name

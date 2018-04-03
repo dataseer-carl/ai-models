@@ -5,9 +5,9 @@ account: dataseer-carl
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 302110
-bundleId: 1297894
+bundleId: 1299432
 url: https://dataseer-carl.shinyapps.io/ai-models/
-when: 1522678091.99207
+when: 1522746608.18958
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: Data
