@@ -1,12 +1,15 @@
 # shinyapps.io wd:  "/srv/connect/apps/ai-models"
 
-library(shiny)
 library(ggplot2)
+library(ggrepel)
 library(scales)
 library(dplyr)
-library(DT)
+library(tidyr)
 library(Metrics)
 library(L1pack)
+library(shiny)
+library(DT)
+library(stringr)
 
 endLab <- function(first.lab, last.lab){
 	temp.fxn <- function(x){
@@ -30,11 +33,19 @@ shinyServer(function(input, output, session) {
 	# reg00 ####
 	## Load
 	runtimeIngest <- reactive({
-		require(readxl)
+		require(readr)
 		runtime.filepath <- input$rawRuntime$datapath
-		runtime.raw <- read_excel(
+		# runtime.raw <- read_excel(
+		# 	runtime.filepath,
+		# 	col_type = c("text", "numeric", "numeric")
+		# )
+		runtime.raw <- read_csv(
 			runtime.filepath,
-			col_type = c("text", "numeric", "numeric")
+			col_types = cols(
+				Case = col_character(),
+				RunTime = col_integer(),
+				RunSize = col_integer()
+			)
 		)
 		runtime.raw <- runtime.raw %>% select(Case, RunSize, RunTime)
 		return(runtime.raw)
@@ -42,14 +53,17 @@ shinyServer(function(input, output, session) {
 	## Show
 	output$dataRuntime <- renderDataTable(
 		{
-			if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
+			# if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
 			runtime.df <- runtimeIngest()
-			return(runtime.df)
-		},
-		rownames = FALSE,
-		options = list(
-			pageLength = 5, lengthChange = FALSE, searching = FALSE
-		)
+			runtime.dt <- datatable(
+					runtime.df,
+					rownames = FALSE,
+					options = list(
+						pageLength = 5, lengthChange = FALSE, searching = FALSE
+					)
+				)
+			return(runtime.dt)
+		}
 	)#dataRuntime
 	### Explore
 	runtimePlot <- reactive({
@@ -75,7 +89,7 @@ shinyServer(function(input, output, session) {
 		return(runtime.gg)
 	})#runtimePlot
 	output$plotRuntime <- renderPlot({
-		if(length(input$rawRuntime) == 0) return(NULL)
+		# if(length(input$rawRuntime) == 0) return(NULL)
 		runtime.gg <- runtimePlot() +
 			labs(
 				title = "RunTime is linear with respect to RunSize",
@@ -85,7 +99,7 @@ shinyServer(function(input, output, session) {
 	})#plotRuntime
 	### Calibrate
 	output$lineRuntime <- renderPlot({
-		if(length(input$rawRuntime) == 0) return(NULL)
+		# if(length(input$rawRuntime) == 0) return(NULL)
 		runtime.gg <- runtimePlot() +
 			geom_abline(
 				slope = input$runtime.slope,
@@ -105,7 +119,7 @@ shinyServer(function(input, output, session) {
 	})
 	output$showPredRuntime <- renderDataTable(
 		{
-			if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
+			# if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
 			runPred.df <- predRuntime()
 			runPred.df <- runPred.df %>% 
 				mutate_at(
@@ -133,7 +147,7 @@ shinyServer(function(input, output, session) {
 		# http://shiny.rstudio.com/gallery/datatables-options.html
 	)
 	residRuntime <- reactive({
-		if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
+		# if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
 		predRuntime.df <- predRuntime()
 		residRuntime.df <- predRuntime.df %>% 
 			summarise(
@@ -236,9 +250,21 @@ shinyServer(function(input, output, session) {
   				Y.hat = round(Y.hat),
   				Resid = round(Resid, digits = 4)
   			)
-  	},
-  	rownames = FALSE,
-  	options = list(paging = FALSE, lengthChange = FALSE, searching = FALSE)
+  		out.dt <- datatable(
+  			out.df,
+  			rownames = FALSE,
+  			options = list(paging = FALSE, lengthChange = FALSE, searching = FALSE)
+  		) %>% 
+			formatStyle(
+				c("X", "Y"),
+				color = "#787c84"
+			) %>% 
+			formatStyle(
+				c("Resid"),
+				fontWeight = "bold"
+			)
+  		return(out.dt)
+  	}
   )
 	observeEvent(
   	input$findOLStoy,
@@ -278,7 +304,261 @@ shinyServer(function(input, output, session) {
 		},
 		digits = 4
 	)
+#   # reg02 ####
+#   ## Load
+# 	adsIngest <- reactive({
+# 		require(readr)
+# 		ads.filepath <- input$rawAds$datapath
+# 		ads.df <- read_csv(
+# 			ads.filepath,
+# 			col_types = cols(
+# 				RowID = col_character(),
+# 				TV = col_number(),
+# 				Radio = col_number(),
+# 				Newspaper = col_number(),
+# 				Sales = col_number()
+# 			)
+# 		)
+# 		return(ads.df)
+# 	})#adsIngest
+# 	## Show
+# 	output$dataAds <- renderDataTable(
+# 		{
+# 			# if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
+# 			ads.df <- adsIngest()
+# 			ads.dt <- datatable(
+# 					ads.df,
+# 					rownames = FALSE,
+# 					options = list(
+# 						pageLength = 10, lengthChange = FALSE, searching = FALSE
+# 					)
+# 				)
+# 			return(ads.dt)
+# 		}
+# 	)#dataAds
+# 	modelAds0 <- reactive({
+# 		ads.df <- adsIngest()
+# 		ads.lm0 <- lm(Sales ~ TV + Radio + Newspaper, data = ads.df)
+# 		return(ads.lm0)
+# 	})
+# 	modelAds1 <- reactive({
+# 		ads.df <- adsIngest()
+# 		ads.lm1 <- lm(Sales ~ TV + Radio, data = ads.df)
+# 		return(ads.lm1)
+# 	})
+# 	modelAds2 <- reactive({
+# 		ads.df <- adsIngest()
+# 		ads.lm2 <- lm(Sales ~ sqrt(TV) + Radio, data = ads.df)
+# 		return(ads.lm2)
+# 	})
+# 	olsAds <- reactive({
+# 		ads.lm <- switch(
+# 			input$pickModelAds,
+# 			`Full additive model` = modelAds0(),
+# 			`Shortlisted additive model` = modelAds1(),
+# 			`Short. add. model w/ trans.` = modelAds2()
+# 		)
+# 		return(ads.lm)
+# 	})
+# 	output$showOLSads <- renderPrint({summary(olsAds())})
+# 	output$eqnOLSads <- renderUI({
+# 		ads.coef <- coef(olsAds())
+# 		x.term <- paste(
+# 			round(ads.coef, digits = 2),
+# 			names(ads.coef),
+# 			sep = "\\cdot",
+# 			collapse = " + "
+# 		)
+# 		eqn <- paste("Sales", x.term, sep = " = ")
+# 		eqn.print <- paste(
+# 			"$$", eqn, "$$",
+# 			sep = " "
+# 		)
+# 		withMathJax(helpText(eqn.print))
+# 	})
+  # reg03 ####
+  ## Load
+	nplIngest <- reactive({
+		require(readr)
+		npl.filepath <- input$rawNPL$datapath
+		npl.raw <- read_csv(
+			npl.filepath,
+			col_types = cols(
+			  Qtr.date = col_date(format = "%Y-%m-%d"),
+			  Industry = col_character(),
+			  Loans = col_integer(),
+			  NPL = col_integer(),
+			  NPL.ratio = col_double(),
+			  Loans.yoy = col_double(),
+			  REtag = col_character()
+			)
+		)
+		npl.df <- npl.raw %>%
+			select(
+				Qtr.date, Industry, REtag, Loans, NPL, Loans.yoy, NPL.ratio
+			) %>%
+			mutate(
+				NPLratio.log = log(NPL.ratio)
+			)
+		return(npl.df)
+	})#npl.raw
+  output$dataNPL <- renderDataTable(
+		{
+			# if(length(input$rawRuntime) == 0) return(data.frame("Error" = "Upload Runtime.xlsx"))
+			npl.df <- nplIngest()
+			npl.df <- npl.df %>% select(-NPLratio.log)
+			npl.dt <- datatable(
+					npl.df,
+					rownames = FALSE,
+					options = list(
+						paging = FALSE, lengthChange = FALSE, searching = FALSE
+					)
+				) %>%
+				formatStyle(
+					c("Qtr.date", "Industry", "Loans", "NPL"),
+					color = "#787c84"
+				) %>%
+				formatPercentage(c("Loans.yoy", "NPL.ratio"), digits = 2) %>%
+				formatRound(c("Loans", "NPL"), digits = 0) %>%
+				formatStyle(
+					c("REtag", "Loans.yoy", "NPL.ratio"),
+					fontWeight = "bold"
+				) %>%
+				formatStyle(
+					c("NPL.ratio"),
+					background = "#FDF5E6"
+				)
+			return(npl.dt)
+		}
+	)#dataRuntime
+  useNPL <- reactive({
+  	switch(
+  		input$scaleNPL,
+  		"NPL.ratio" = "NPL ratio",
+  		"NPLratio.log" = "log(NPL ratio)"
+  	)
+  })
+  scaleFxnNPL <- reactive({
+  	switch(
+  		input$scaleNPL,
+  		"NPL.ratio" = percent,
+  		"NPLratio.log" = comma
+  	)
+  })
+  formulaNPL <- reactive({
+  	NPL.y <- useNPL() %>% str_replace_all(c(" " = "."))
+  	NPL.x <- "Loans.yoy"
+  	if(input$plusREtag){
+  		operator <- c(
+  			"add" = " + ",
+  			"int" = ":",
+  			"cross" = " * "
+  		)
+  		RE.operator <- operator[match(input$configREtag, names(operator))]
+  		NPL.x <- paste(NPL.x, "REtag", sep = RE.operator)
+  	}
+  	NPL.eqn <- as.formula(paste(NPL.y, NPL.x, sep = " ~ "))
+  	return(NPL.eqn)
+  })
+  lmNPL <- reactive({
+  	loans.df <- nplIngest()
+  	NPL.eqn <- formulaNPL()
+  	NPL.lm <- lm(NPL.eqn, data = loans.df)
+  	return(NPL.lm)
+  })
+  output$showlmNPL <- renderPrint({
+  	summary(lmNPL())
+  })
+  output$showFormulaNPL <- renderPrint({
+  	print(formulaNPL())
+  })
+  coefNPL <- reactive({
 
+  	npl.lm <- lmNPL()
+
+		vec2df <- function(x) data.frame(X1 = names(x), X2 = x, stringsAsFactors = FALSE)
+
+		base.x <- "Loans.yoy"
+		dummy.x <- "REtag"
+		dummy.relevel <- "non-Real Estate"
+
+		coef.df <- coef(npl.lm) %>%
+			vec2df() %>%
+			rename(Variable = X1, Coef = X2) %>%
+			mutate(
+				isSlope = Variable %>% str_detect(base.x),
+				isBase = Variable %in% c("(Intercept)", base.x),
+				X = ifelse(isSlope, "Slope", "Intercept"),
+				Dummies = Variable %>%
+					str_extract(
+						paste0("(?<=", dummy.x, ").+$")
+					)
+			) %>%
+			replace_na(list(Dummies = dummy.relevel)) %>%
+			group_by(X) %>%
+			arrange(Variable) %>%
+			mutate(
+				Coef.adj = (`!`(isBase) * Coef) + sum(isBase * Coef)
+			) %>%
+			ungroup() %>%
+			select(X, Dummies, Coef.adj) %>%
+			complete(X, Dummies) %>%
+			group_by(X) %>%
+			arrange(Coef.adj) %>%
+			fill(Coef.adj) %>%
+			ungroup() %>%
+			spread("X", "Coef.adj") %>%
+			rename(REtag = Dummies)
+		if(!input$plusREtag) coef.df <- coef.df %>% mutate(REtag = "All")
+		return(coef.df)
+  })
+  output$plotNPL <- renderPlot({
+		# if(length(input$rawRuntime) == 0) return(NULL)
+  	loans.df <- nplIngest()
+
+  	loans.df$NPL.y = loans.df[,input$scaleNPL]
+  	labNPL <- scaleFxnNPL()
+
+  	coef.df <- coefNPL()
+
+  	npl.gg <- if(input$plusREtag){
+  		ggplot(loans.df) +
+  			aes(x = Loans.yoy, y = NPL.y, label = Industry, colour = REtag) +
+  			geom_abline(
+					aes(slope = Slope, intercept = Intercept, colour = REtag),
+					data = coef.df
+				) +
+  			scale_colour_discrete(guide = FALSE)
+  	} else{
+  		ggplot(loans.df) + 
+  			geom_abline(
+					aes(slope = Slope, intercept = Intercept),
+					data = coef.df
+				) +
+  			aes(x = Loans.yoy, y = NPL.y, label = Industry)
+  	}
+
+		npl.gg <- npl.gg +
+			geom_point() +
+			scale_x_continuous(labels = percent, name = "YoY growth in loans", limits = c(-0.075, 0.175)) +
+			scale_y_continuous(labels = labNPL, name = useNPL()) +
+			theme(
+				panel.background = element_blank(),
+				panel.grid = element_blank(),
+				axis.line = element_line(colour = "black")
+			)
+		if(input$labelsNPL) npl.gg <- npl.gg + geom_text_repel(colour = "#787c84")
+		print(npl.gg)
+	})#plotNPL
+  output$showCoefNPL <- renderTable({
+  	coef.df <- coefNPL()
+  	return(coef.df)
+  })
+  
+	# CV00 ####
+	# CV01 ####
+	# CV02 ####
+	
 	  # Test ####
 # 	# Print wd ###
 #   output$check_WD <- renderPrint({getwd()})

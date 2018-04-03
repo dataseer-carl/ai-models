@@ -1,0 +1,1 @@
+Data on the budgets allocated for three advertising platforms (*TV*, *Radio*, and *Newspaper*) for their different markets have been requested from the different advertising units groupwide. Data can be located at: [`Day 1/regression00_ols1_ads/Data/Advertising.csv`](https://drive.google.com/open?id=1IdfYwgCFD6TOHh0zYyHEdMguhncYCnEe).
