@@ -5,9 +5,9 @@ account: dataseer-carl
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 302110
-bundleId: 1299432
+bundleId: 1303349
 url: https://dataseer-carl.shinyapps.io/ai-models/
-when: 1522746608.18958
+when: 1522910921.40884
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: Data
+ignoredFiles: www/car-insurance1.jpg|Data

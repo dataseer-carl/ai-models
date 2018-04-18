@@ -307,62 +307,62 @@ shinyUI(navbarPage(
 				)#tabPanel
   		)#tabsetPanel
   	),#tabPanel:OLS
-  	"----",
-  	"Machine learning", # section title
-  	## _DT&RF ####
-  	tabPanel(
-  		"DT & RF",
-  		h1("Decision tree"),
-  		tags$ul(
-  			tags$li("Leaf nodes:sometimes referred to as size of tree"),
-  			tags$li("Non-leaf nodes"),
-  			tags$li("Pruning: reducing size of tree to reduce complexity")
-  		),
-  		h1("Random forest"),
-  		tags$ul(
-  			tags$li("Bagging"),
-  			tags$li("Random subspace sampling"),
-  			tags$li("mtry"),
-  			tags$li("ntrees")
-  		)
-  	),#tabPanel:Trees&Forests
+  	"----"#,
+  	# "Machine learning", # section title
+  	# ## _DT&RF ####
+  	# tabPanel(
+  	# 	"DT & RF",
+  	# 	h1("Decision tree"),
+  	# 	tags$ul(
+  	# 		tags$li("Leaf nodes:sometimes referred to as size of tree"),
+  	# 		tags$li("Non-leaf nodes"),
+  	# 		tags$li("Pruning: reducing size of tree to reduce complexity")
+  	# 	),
+  	# 	h1("Random forest"),
+  	# 	tags$ul(
+  	# 		tags$li("Bagging"),
+  	# 		tags$li("Random subspace sampling"),
+  	# 		tags$li("mtry"),
+  	# 		tags$li("ntrees")
+  	# 	)
+  	# ),#tabPanel:Trees&Forests
   	## _Neural net ####
-  	tabPanel("Neural net")#tabPanel:NeuralNet
+  	# tabPanel("Neural net")#tabPanel:NeuralNet
   ),#navbarMenu:Regression
   
   # Model Eval ####
-  navbarMenu(
-  	"Model Evaluation",
-  	tabPanel(
-  		"Train-test split",
-  		p("Lorem ipsum")
-  	),#tabPanel:traintestsplit
-  	tabPanel(
-  		"Cross-validation",
-  		p("Lorem ipsum")
-  	),#tabPanel:Cross-validation
-  	"----",
-  	tabPanel(
-  		"Feature selection",
-  		p("Lorem ipsum")
-  	)#tabPanel:FeatureSelection
-  ),#navbarMenu:ModelEval
+  # navbarMenu(
+  # 	"Model Evaluation",
+  # 	tabPanel(
+  # 		"Train-test split",
+  # 		p("Lorem ipsum")
+  # 	),#tabPanel:traintestsplit
+  # 	tabPanel(
+  # 		"Cross-validation",
+  # 		p("Lorem ipsum")
+  # 	),#tabPanel:Cross-validation
+  # 	"----",
+  # 	tabPanel(
+  # 		"Feature selection",
+  # 		p("Lorem ipsum")
+  # 	)#tabPanel:FeatureSelection
+  # ),#navbarMenu:ModelEval
   
   # Classification ####
-  navbarMenu(
-  	"Classification", # menu name
-  	"Statistical learning", # section title
-  	## _Logit ####
-  	tabPanel("Logistic"),#tabPanel:Logistic
-  	"----",
-  	"Machine learning", # section title
-  	## _DT&RF ####
-  	tabPanel("DT & RF"),#tabPanel:Trees&Forests
-  	## _Neural net ####
-  	tabPanel("Neural net"),#tabPanel:NeuralNet
-  	## _SVM ####
-  	tabPanel("SVM")#tabPanel:SVM
-  ),#navbarMenu:Classification
+  # navbarMenu(
+  # 	"Classification", # menu name
+  # 	"Statistical learning", # section title
+  # 	## _Logit ####
+  # 	tabPanel("Logistic"),#tabPanel:Logistic
+  # 	"----",
+  # 	"Machine learning", # section title
+  # 	## _DT&RF ####
+  # 	tabPanel("DT & RF"),#tabPanel:Trees&Forests
+  # 	## _Neural net ####
+  # 	tabPanel("Neural net"),#tabPanel:NeuralNet
+  # 	## _SVM ####
+  # 	tabPanel("SVM")#tabPanel:SVM
+  # ),#navbarMenu:Classification
   
 	# Workshops ####
   navbarMenu(
@@ -392,23 +392,72 @@ shinyUI(navbarPage(
   		)#fluidRow
   	),#tabPanel
   	tabPanel(
-  		"Day 2: Regression",
-  		p("Lorem ipsum")
+  		"Day 2: Melbourne housing",
+  		# fileInput("answerkeyDay1", "Upload Runtime.csv"),
+  		h1("Housing prices prediction"),
+  		p("Day 2 Workshop"),
+  		fluidRow(
+  			column(
+  				width = 7,
+  				wellPanel(
+  					includeMarkdown("readme_workshop_day2.md")
+  				)
+  				# div(img(src = "car-insurance1.jpg"), align = "center", style = "width: 150px;"),
+  			),#column
+  			column(
+  				width = 5,
+  				fileInput("answerHousing", "Answer key"),
+  				fileInput("submitHousing", "Submissions"),
+  				div(
+						dataTableOutput("rankHousing"),
+						tags$style(type="text/css", "#view tr:last-child {font-weight:bold;}")
+					)
+  			)
+  		)#fluidRow
   	),#tabPanel
   	tabPanel(
-  		"Day 3: Classification",
-  		p("Lorem ipsum")
-  	)#tabPanel
+  		"Day 3: Credit default",
+  		# fileInput("answerkeyDay1", "Upload Runtime.csv"),
+  		h1("Credit default prediction"),
+  		p("Day 3 Workshop"),
+  		fluidRow(
+  			column(
+  				width = 7,
+  				wellPanel(
+  					includeMarkdown("readme_workshop_day3.md")
+  				)
+  				# div(img(src = "car-insurance1.jpg"), align = "center", style = "width: 150px;"),
+  			),#column
+  			column(
+  				width = 5,
+  				fileInput("answerCredit", "Answer key"),
+  				fileInput("submitCredit", "Submissions"),
+  				div(
+						dataTableOutput("rankCredit"),
+						tags$style(type="text/css", "#view tr:last-child {font-weight:bold;}")
+					)
+  			)
+  		)#fluidRow
+  	),#tabPanel
+  	"----"
+#   	tabPanel(
+#   		"Day 2: Regression",
+#   		p("Lorem ipsum")
+#   	),#tabPanel
+#   	tabPanel(
+#   		"Day 3: Classification",
+#   		p("Lorem ipsum")
+#   	)#tabPanel
   ),#navbarMenu
 
   # About ####
-  tabPanel(
-  	"About", # tab name
-  	p("Lorem ipsum")
+  # tabPanel(
+  # 	"About", # tab name
+  # 	p("Lorem ipsum")
   	# Test ####
   	# verbatimTextOutput("check_WD"),
   	# verbatimTextOutput("check_WDls")
-  ),#tabPanel
+  # ),#tabPanel
   
   # Layout config
   # selected = "",

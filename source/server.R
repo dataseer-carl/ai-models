@@ -619,6 +619,126 @@ shinyServer(function(input, output, session) {
   		return(scores.dt)
   	}
   )#showScores
+  # Workshop ####
+  scoreHousing <- reactive({
+  	
+  	answer.path <- input$answerHousing$datapath
+  	# answer.path <- file.path(".", "source", "Data", "potential-claims predictions.rds")
+  	key.df <- readRDS(answer.path)
+  	
+  	submit.path <- input$submitHousing$datapath
+  	# submit.path <- file.path(".", "source", "Data", "sample00.xlsx")
+  	
+  	teams <- excel_sheets(submit.path)
+  	submit.ls <- lapply(
+			as.list(teams),
+			function(temp.team){
+				temp.df <- read_excel(submit.path, sheet = temp.team, col_names = TRUE)
+				temp.df <- temp.df %>%
+					mutate(Team = temp.team) %>% 
+					rename(Price.hat = `Scored Labels`)
+				return(temp.df)
+			}
+		)
+		names(submit.ls) <- teams
+		
+		submit.df <- do.call(bind_rows, submit.ls)
+		results.df <- submit.df %>% 
+			left_join(key.df) %>% 
+			group_by(Team) %>% 
+			summarise(RMSE = rmse(Price, Price.hat)) %>% 
+			ungroup() %>% 
+			mutate(Rank = rank(RMSE))
+  	
+		return(results.df)
+		
+  })#scoreHousing
+  output$rankHousing <- renderDataTable(
+  	{
+  		scores.df <- scoreHousing()
+  		scores.dt <- scores.df %>% 
+  			select(Rank, Team, RMSE) %>% 
+  			arrange(RMSE) %>% 
+  			datatable(
+  				rownames = FALSE,
+  				options = list(
+			  		paging = FALSE, lengthChange = FALSE, searching = FALSE, 
+			  		ordering = FALSE, info = FALSE
+			  	)
+  			) %>% 
+  			formatStyle(
+  				"Rank", target = "row",
+  				backgroundColor = styleEqual(
+  					1:3,
+  					c("gold", "silver", "orange")
+  				)
+  			) %>% 
+  			formatRound("RMSE")
+  		# https://rstudio.github.io/DT/010-style.html
+  		return(scores.dt)
+  	}
+  )#showScores
+  # Workshop ####
+  scoreCredit <- reactive({
+  	
+  	answer.path <- input$answerCredit$datapath
+  	# answer.path <- file.path(".", "source", "Data", "potential-claims predictions.rds")
+  	key.df <- readRDS(answer.path)
+  	
+  	submit.path <- input$submitCredit$datapath
+  	# submit.path <- file.path(".", "source", "Data", "sample00.xlsx")
+  	
+  	teams <- excel_sheets(submit.path)
+  	submit.ls <- lapply(
+			as.list(teams),
+			function(temp.team){
+				temp.df <- read_excel(submit.path, sheet = temp.team, col_names = TRUE)
+				temp.df <- temp.df %>% mutate(Team = temp.team, ID = as.character(1:n()))
+				names(temp.df)[1] <- "Default.hat"
+				return(temp.df)
+			}
+		)
+		names(submit.ls) <- teams
+		
+		submit.df <- do.call(bind_rows, submit.ls)
+		results.df <- submit.df %>% 
+			left_join(key.df) %>% 
+			group_by(Team) %>% 
+			summarise(Accuracy = accuracy(Default, Default.hat)) %>% 
+			ungroup()
+		val.df <- results.df %>% 
+			select(Accuracy) %>% 
+			distinct() %>% 
+			mutate(Rank = rank(-Accuracy, ties.method = "min"))
+		rank.df <- results.df %>% left_join(val.df)
+		return(rank.df)
+		
+  })#scoreCredit
+  output$rankCredit <- renderDataTable(
+  	{
+  		scores.df <- scoreCredit()
+  		scores.dt <- scores.df %>% 
+  			select(Rank, Team, Accuracy) %>% 
+  			arrange(desc(Accuracy)) %>% 
+  			datatable(
+  				rownames = FALSE,
+  				options = list(
+			  		paging = FALSE, lengthChange = FALSE, searching = TRUE, 
+			  		ordering = FALSE, info = FALSE
+			  	)
+  			) %>% 
+  			formatStyle(
+  				"Rank", target = "row",
+					backgroundColor = styleInterval(
+  					c(1.99, 2.99, 3.99),
+  					c("gold", "silver", "orange", "white")
+  				)
+  			) %>% 
+  			formatPercentage("Accuracy", digits = 4)
+  		# https://rstudio.github.io/DT/010-style.html
+  		return(scores.dt)
+  	}
+  )#showScores
   
 	  # Test ####
 # 	# Print wd ###
